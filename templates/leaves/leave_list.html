@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Leave Types{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'leave_list' %}">Leave Management</a></li>
+    <li class="breadcrumb-item active">Leave Types</li>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Leave Types</h3>
+        <div class="card-tools">
+            <a href="{% url 'leavetype_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Leave Type
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Max Days</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leavetype in leavetypes %}
+                <tr>
+                    <td>{{ leavetype.name }}</td>
+                    <td>{{ leavetype.max_days }}</td>
+                    <td>{{ leavetype.description|truncatechars:50 }}</td>
+                    <td>
+                        <a href="{% url 'leavetype_update' leavetype.pk %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="{% url 'leavetype_delete' leavetype.pk %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No leave types found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
