@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     # Leave Request URLs
     path('', views.leave_request_list, name='leave_list'),
