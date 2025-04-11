@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Employee, Department, Position
-from .forms import EmployeeCreationForm, EmployeeUpdateForm, DepartmentForm, PositionForm
+from .models import Employee, Department
+from .forms import EmployeeCreationForm, EmployeeUpdateForm, DepartmentForm
 
 def is_hr(user):
     return user.is_authenticated and user.is_hr
