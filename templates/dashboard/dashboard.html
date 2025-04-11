@@ -4,156 +4,100 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block breadcrumbs %}
-    <li class="breadcrumb-item active">Dashboard</li>
+<li class="breadcrumb-item active">Dashboard</li>
 {% endblock %}
-
 
 {% block content %}
 <div class="row">
-    <div class="col-12 text-right">
-        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-    </div>
-
-
     {% if request.user.is_hr %}
-    <!-- HR Dashboard -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3>{{ total_employees }}</h3>
-                <p>Total Employees</p>
+        <!-- HR Dashboard Cards -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ total_employees }}</h3>
+                    <p>Total Employees</p>
+                </div>
+                <div class="icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <a href="{% url 'employee_list' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <div class="icon">
-                <i class="bi bi-people"></i>
-            </div>
-            <a href="{% url 'employee_list' %}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
         </div>
-    </div>
-    
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3>{{ pending_leaves }}</h3>
-                <p>Pending Leaves</p>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ pending_leaves }}</h3>
+                    <p>Pending Leaves</p>
+                </div>
+                <div class="icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+                <a href="{% url 'leave_list' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <div class="icon">
-                <i class="bi bi-calendar-x"></i>
-            </div>
-            <a href="{% url 'leave_list' %}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
         </div>
-    </div>
     {% else %}
-    <!-- Employee Dashboard -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3>{{ approved }}</h3>
-                <p>Approved Leaves</p>
+        <!-- Employee Dashboard Cards -->
+        {% for label, count, color, icon, status in [
+            ("Approved Leaves", approved, "success", "calendar-check", "A"),
+            ("Pending Leaves", pending, "warning", "calendar-x", "P"),
+            ("Rejected Leaves", rejected, "danger", "calendar-minus", "R")
+        ] %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-{{ color }}">
+                <div class="inner">
+                    <h3>{{ count }}</h3>
+                    <p>{{ label }}</p>
+                </div>
+                <div class="icon">
+                    <i class="bi bi-{{ icon }}"></i>
+                </div>
+                <a href="{% url 'leave_list' %}?status={{ status }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <div class="icon">
-                <i class="bi bi-calendar-check"></i>
-            </div>
-            <a href="{% url 'leave_list' %}?status=A" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
         </div>
-    </div>
-    
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3>{{ pending }}</h3>
-                <p>Pending Leaves</p>
-            </div>
-            <div class="icon">
-                <i class="bi bi-calendar-x"></i>
-            </div>
-            <a href="{% url 'leave_list' %}?status=P" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3>{{ rejected }}</h3>
-                <p>Rejected Leaves</p>
-            </div>
-            <div class="icon">
-                <i class="bi bi-calendar-minus"></i>
-            </div>
-            <a href="{% url 'leave_list' %}?status=R" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
+        {% endfor %}
     {% endif %}
 </div>
 
 <div class="row">
+    <!-- Recent Leave Requests -->
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Recent Leave Requests</h3>
-            </div>
+            <div class="card-header"><h3 class="card-title">Recent Leave Requests</h3></div>
             <div class="card-body p-0">
                 <table class="table table-striped">
                     <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Dates</th>
-                            <th>Status</th>
-                        </tr>
+                        <tr><th>Type</th><th>Dates</th><th>Status</th></tr>
                     </thead>
                     <tbody>
                         {% for leave in recent_leaves %}
-                        <tr>
-                            <td>{{ leave.leave_type.name }}</td>
-                            <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
-                            <td>
-                                <span class="badge bg-{% if leave.status == 'A' %}success{% elif leave.status == 'R' %}danger{% else %}warning{% endif %}">
-                                    {{ leave.get_status_display }}
-                                </span>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>{{ leave.leave_type.name }}</td>
+                                <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                                <td>
+                                    <span class="badge bg-{% if leave.status == 'A' %}success{% elif leave.status == 'R' %}danger{% else %}warning{% endif %}">
+                                        {{ leave.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
                         {% empty %}
-                        <tr>
-                            <td colspan="3">No recent leave requests</td>
-                        </tr>
+                            <tr><td colspan="3">No recent leave requests</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    
+
+    <!-- Upcoming Holidays -->
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Upcoming Holidays</h3>
-            </div>
+            <div class="card-header"><h3 class="card-title">Upcoming Holidays</h3></div>
             <div class="card-body p-0">
                 <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Holiday</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Date</th><th>Holiday</th></tr></thead>
                     <tbody>
-                        <tr>
-                            <td>2023-12-25</td>
-                            <td>Christmas Day</td>
-                        </tr>
-                        <tr>
-                            <td>2024-01-01</td>
-                            <td>New Year's Day</td>
-                        </tr>
+                        <tr><td>2023-12-25</td><td>Christmas Day</td></tr>
+                        <tr><td>2024-01-01</td><td>New Year's Day</td></tr>
                     </tbody>
                 </table>
             </div>
