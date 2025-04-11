@@ -5,7 +5,6 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import LeaveRequest, LeaveType
 from .forms import LeaveRequestForm, LeaveTypeForm
-from employees.models import Employee
 
 
 def is_hr(user):
@@ -119,3 +118,4 @@ class LeaveTypeDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Leave type deleted successfully!')
         return super().delete(request, *args, **kwargs)
+
