@@ -51,8 +51,10 @@ def department_create(request):
         form = DepartmentForm()
     return render(request, 'employees/department_form.html', {'form': form})
 
+
+# employees/views.py
 @login_required
-@user_passes_test(lambda u: u.is_hr)  # Only HR can create employees
+@user_passes_test(lambda u: u.is_hr)
 def employee_create(request):
     if request.method == 'POST':
         form = EmployeeCreationForm(request.POST, request.FILES)
@@ -65,7 +67,8 @@ def employee_create(request):
 
     return render(request, 'employees/employee_form.html', {
         'form': form,
-        'title': 'Create New Employee'
+        'title': 'Create New Employee',
+        'can_edit_hr': request.user.is_hr
     })
 
 
@@ -73,14 +76,10 @@ def employee_create(request):
 def employee_update(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
 
-    # Only HR can update HR status
-    can_edit_hr = request.user.is_hr
-
     if request.method == 'POST':
         form = EmployeeUpdateForm(request.POST, request.FILES, instance=employee)
         if form.is_valid():
             if not request.user.is_hr:
-                # Preserve original HR status if non-HR is editing
                 form.instance.is_hr = employee.is_hr
             form.save()
             messages.success(request, 'Employee updated successfully!')
@@ -91,7 +90,6 @@ def employee_update(request, pk):
     return render(request, 'employees/employee_form.html', {
         'form': form,
         'employee': employee,
-        'can_edit_hr': can_edit_hr,
-        'title': f'Update {employee.username}'
+        'title': f'Update {employee.username}',
+        'can_edit_hr': request.user.is_hr
     })
-

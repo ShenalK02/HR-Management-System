@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">Basic Information</div>
+                    <div class="card-body">
+                        {% if form.username %}{{ form.username|as_crispy_field }}{% endif %}
+                        {{ form.email|as_crispy_field }}
+                        {{ form.first_name|as_crispy_field }}
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">Employment Details</div>
+                    <div class="card-body">
+                        {{ form.employee_id|as_crispy_field }}
+                        {{ form.position|as_crispy_field }}
+                        {% if form.is_hr and can_edit_hr %}
+                            {{ form.is_hr|as_crispy_field }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">Additional Information</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if form.gender %}{{ form.gender|as_crispy_field }}{% endif %}
+                        {% if form.date_of_birth %}{{ form.date_of_birth|as_crispy_field }}{% endif %}
+                        {% if form.phone_number %}{{ form.phone_number|as_crispy_field }}{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if form.address %}{{ form.address|as_crispy_field }}{% endif %}
+                        {% if form.profile_picture %}{{ form.profile_picture|as_crispy_field }}{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if form.password1 and form.password2 %}
+        <div class="card mb-4">
+            <div class="card-header">Password</div>
+            <div class="card-body">
+                {{ form.password1|as_crispy_field }}
+                {{ form.password2|as_crispy_field }}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                {% if employee %}Update{% else %}Create{% endif %} Employee
+            </button>
+            <a href="{% if employee %}{% url 'employee_detail' employee.pk %}{% else %}{% url 'employee_list' %}{% endif %}"
+               class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

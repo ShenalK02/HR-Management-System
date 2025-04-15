@@ -6,17 +6,17 @@ from .models import Employee, Department, Position
 class EmployeeCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = Employee
-        fields = ('username', 'email', 'first_name', 'last_name', 'employee_id', 'position')
-
+        fields = ('username', 'email', 'first_name', 'last_name', 'employee_id', 'position',
+                  'gender', 'date_of_birth', 'phone_number', 'address', 'profile_picture', 'is_hr')
 
 class EmployeeUpdateForm(UserChangeForm):
     password = None
 
     class Meta:
         model = Employee
-        fields = ('first_name', 'last_name', 'email', 'employee_id', 'position',
+        fields = ('username', 'first_name', 'last_name', 'email', 'employee_id', 'position',
                   'gender', 'date_of_birth', 'phone_number', 'address',
-                  'profile_picture', 'emergency_contact_name', 'emergency_contact_phone')
+                  'profile_picture', 'is_hr', 'emergency_contact_name', 'emergency_contact_phone')
 
 
 class DepartmentForm(forms.ModelForm):
