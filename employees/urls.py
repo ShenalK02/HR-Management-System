@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import employee_list
 
 urlpatterns = [
     path('', views.employee_list, name='employee_list'),
@@ -9,5 +10,8 @@ urlpatterns = [
 
     path('departments/', views.department_list, name='department_list'),
     path('departments/create/', views.department_create, name='department_create'),
+
+    path('', employee_list, name='employee_list'),
+
     # Add other department and position URLs
 ]

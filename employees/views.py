@@ -11,7 +11,10 @@ def is_hr(user):
 
 @login_required
 def employee_list(request):
-    employees = Employee.objects.all()
+    if request.user.is_hr:
+        employees = Employee.objects.all()
+    else:
+        employees = Employee.objects.filter(is_hr=False)
     return render(request, 'employees/employee_list.html', {'employees': employees})
 
 @login_required
