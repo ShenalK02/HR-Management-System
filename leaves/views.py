@@ -17,7 +17,7 @@ def leave_request_list(request):
         leaves = LeaveRequest.objects.all().order_by('-date_requested')
     else:
         leaves = LeaveRequest.objects.filter(employee=request.user).order_by('-date_requested')
-    return render(request, 'leaves/leave_type_list.html', {'leaves': leaves})
+    return render(request, 'leaves/leave_request_list.html', {'leaves': leaves})
 
 
 @login_required

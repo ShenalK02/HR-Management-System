@@ -11,11 +11,13 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Leave Types</h3>
+        {% if user.is_hr %}
         <div class="card-tools">
             <a href="{% url 'leavetype_create' %}" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Add Leave Type
             </a>
         </div>
+        {% endif %}
     </div>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
@@ -24,7 +26,9 @@
                     <th>Name</th>
                     <th>Max Days</th>
                     <th>Description</th>
+                    {% if user.is_hr %}
                     <th>Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -33,6 +37,7 @@
                     <td>{{ leavetype.name }}</td>
                     <td>{{ leavetype.max_days }}</td>
                     <td>{{ leavetype.description|truncatechars:50 }}</td>
+                    {% if user.is_hr %}
                     <td>
                         <a href="{% url 'leavetype_update' leavetype.pk %}" class="btn btn-sm btn-primary">
                             <i class="bi bi-pencil"></i> Edit
@@ -41,10 +46,11 @@
                             <i class="bi bi-trash"></i> Delete
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4">No leave types found</td>
+                    <td colspan="{% if user.is_hr %}4{% else %}3{% endif %}">No leave types found</td>
                 </tr>
                 {% endfor %}
             </tbody>

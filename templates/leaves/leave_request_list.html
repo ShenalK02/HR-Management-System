@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Leave Requests{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'leave_list' %}">Leave Management</a></li>
+    <li class="breadcrumb-item active">Leave Requests</li>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Leave Requests</h3>
+        <div class="card-tools">
+            <a href="{% url 'leave_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> New Request
+            </a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Leave Type</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in leaves %}
+                <tr>
+                    <td>{{ leave.employee }}</td>
+                    <td>{{ leave.leave_type }}</td>
+                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                    <td>{{ leave.get_status_display }}</td>
+                    <td>
+                        {% if request.user.is_hr %}
+                            {% if leave.status == 'P' %}
+                            <a href="{% url 'leave_approve' leave.pk %}" class="btn btn-sm btn-success">
+                                <i class="bi bi-check-circle"></i> Approve
+                            </a>
+                            <a href="{% url 'leave_reject' leave.pk %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-x-circle"></i> Reject
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No leave requests found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
