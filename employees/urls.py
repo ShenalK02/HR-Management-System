@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import employee_list
+from .views import employee_list, employee_create, employee_update
 
 urlpatterns = [
     path('', views.employee_list, name='employee_list'),
@@ -12,6 +12,8 @@ urlpatterns = [
     path('departments/create/', views.department_create, name='department_create'),
 
     path('', employee_list, name='employee_list'),
+    path('create/', employee_create, name='employee_create'),
+    path('<int:pk>/update/', employee_update, name='employee_update'),
 
     # Add other department and position URLs
 ]

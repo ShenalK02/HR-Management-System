@@ -51,4 +51,47 @@ def department_create(request):
         form = DepartmentForm()
     return render(request, 'employees/department_form.html', {'form': form})
 
-# Similar views for Position CRUD operations
+@login_required
+@user_passes_test(lambda u: u.is_hr)  # Only HR can create employees
+def employee_create(request):
+    if request.method == 'POST':
+        form = EmployeeCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            employee = form.save()
+            messages.success(request, f'Employee {employee.username} created successfully!')
+            return redirect('employee_list')
+    else:
+        form = EmployeeCreationForm()
+
+    return render(request, 'employees/employee_form.html', {
+        'form': form,
+        'title': 'Create New Employee'
+    })
+
+
+@login_required
+def employee_update(request, pk):
+    employee = get_object_or_404(Employee, pk=pk)
+
+    # Only HR can update HR status
+    can_edit_hr = request.user.is_hr
+
+    if request.method == 'POST':
+        form = EmployeeUpdateForm(request.POST, request.FILES, instance=employee)
+        if form.is_valid():
+            if not request.user.is_hr:
+                # Preserve original HR status if non-HR is editing
+                form.instance.is_hr = employee.is_hr
+            form.save()
+            messages.success(request, 'Employee updated successfully!')
+            return redirect('employee_detail', pk=employee.pk)
+    else:
+        form = EmployeeUpdateForm(instance=employee)
+
+    return render(request, 'employees/employee_form.html', {
+        'form': form,
+        'employee': employee,
+        'can_edit_hr': can_edit_hr,
+        'title': f'Update {employee.username}'
+    })
+
