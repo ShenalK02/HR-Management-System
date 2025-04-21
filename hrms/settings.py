@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'employees',
     'leaves',
     'dashboard',
+    'payroll',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
