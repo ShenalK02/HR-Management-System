@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Announcements</h2>
+        {% if user.is_hr %}
+        <a href="{% url 'announcement_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Announcement
+        </a>
+        {% endif %}
+    </div>
+
+    {% if announcements %}
+        {% for announcement in announcements %}
+            <div class="card mb-3 {% if announcement.is_important %}border-danger{% endif %}">
+                <div class="card-header d-flex justify-content-between {% if announcement.is_important %}bg-danger text-white{% endif %}">
+                    <h5 class="mb-0">
+                        {% if announcement.is_important %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {% endif %}
+                        {{ announcement.title }}
+                    </h5>
+                    <small>{{ announcement.created_at|date:"M d, Y" }}</small>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ announcement.content|truncatewords:50 }}</p>
+                    <a href="{% url 'announcement_detail' announcement.pk %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                    {% if user.is_hr %}
+                    <div class="mt-2">
+                        <a href="{% url 'announcement_edit' announcement.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a href="{% url 'announcement_delete' announcement.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-muted">
+                    Posted by: {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
+                    {% if announcement.expiry_date %}
+                    <span class="float-end">Expires: {{ announcement.expiry_date|date:"M d, Y" }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            No announcements available at this time.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

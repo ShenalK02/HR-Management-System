@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Performance Review{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Schedule Performance Review</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.employee.label_tag }}
+                    {{ form.employee }}
+                    {% if form.employee.errors %}
+                        <div class="text-danger">{{ form.employee.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.department_head.label_tag }}
+                    {{ form.department_head }}
+                    {% if form.department_head.errors %}
+                        <div class="text-danger">{{ form.department_head.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.title.label_tag }}
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.scheduled_date.label_tag }}
+                    {{ form.scheduled_date }}
+                    <small class="form-text text-muted">{{ form.scheduled_date.help_text }}</small>
+                    {% if form.scheduled_date.errors %}
+                        <div class="text-danger">{{ form.scheduled_date.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Schedule Review</button>
+                    <a href="{% url 'review_calendar' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Performance Review Calendar{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Performance Review Calendar</h1>
+    
+    {% if user.is_hr %}
+    <div class="mb-4">
+        <a href="{% url 'schedule_review' %}" class="btn btn-primary">Schedule New Review</a>
+    </div>
+    {% endif %}
+    
+    <h2>Upcoming Reviews</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Title</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in upcoming_reviews %}
+                <tr>
+                    <td>{{ review.employee }}</td>
+                    <td>{{ review.title }}</td>
+                    <td>{{ review.scheduled_date|date:"M d, Y h:i A" }}</td>
+                    <td>{{ review.get_status_display }}</td>
+                    <td>
+                        <a href="{% url 'review_detail' review.id %}" class="btn btn-sm btn-info">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No upcoming reviews scheduled.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <h2 class="mt-4">Past Reviews</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Title</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in past_reviews %}
+                <tr>
+                    <td>{{ review.employee }}</td>
+                    <td>{{ review.title }}</td>
+                    <td>{{ review.scheduled_date|date:"M d, Y h:i A" }}</td>
+                    <td>{{ review.get_status_display }}</td>
+                    <td>
+                        <a href="{% url 'review_detail' review.id %}" class="btn btn-sm btn-info">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No past reviews found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

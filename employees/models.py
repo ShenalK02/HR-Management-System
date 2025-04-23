@@ -40,6 +40,7 @@ class Employee(AbstractUser):
     emergency_contact_phone = models.CharField(max_length=20)
     profile_picture = models.ImageField(upload_to='employee_profiles/', blank=True, null=True)
     is_hr = models.BooleanField(default=False)  # HR flag, default False
+    is_department_head = models.BooleanField(default=False)  # Added department head flag
 
     # Group and Permission relationships (custom related_name to avoid clashes)
     groups = models.ManyToManyField(

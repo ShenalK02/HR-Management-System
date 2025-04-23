@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'announcement_list' %}">Announcements</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ announcement.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card {% if announcement.is_important %}border-danger{% endif %}">
+        <div class="card-header {% if announcement.is_important %}bg-danger text-white{% endif %}">
+            <h3 class="mb-0">
+                {% if announcement.is_important %}
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {% endif %}
+                {{ announcement.title }}
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                {{ announcement.content|linebreaks }}
+            </div>
+            
+            {% if user.is_hr %}
+            <div class="mt-4">
+                <a href="{% url 'announcement_edit' announcement.pk %}" class="btn btn-outline-primary">Edit</a>
+                <a href="{% url 'announcement_delete' announcement.pk %}" class="btn btn-outline-danger">Delete</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+            <div class="row">
+                <div class="col-md-6">
+                    Posted by: {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
+                </div>
+                <div class="col-md-6 text-md-end">
+                    Posted on: {{ announcement.created_at|date:"F d, Y H:i" }}
+                    {% if announcement.expiry_date %}
+                    <br>Expires on: {{ announcement.expiry_date|date:"F d, Y" }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'announcement_list' %}" class="btn btn-secondary">Back to Announcements</a>
+    </div>
+</div>
+{% endblock %}
+
