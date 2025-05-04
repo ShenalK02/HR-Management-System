@@ -4,8 +4,11 @@ from . import views
 app_name = 'birthday_calendar'
 
 urlpatterns = [
-    path('', views.birthday_calendar, name='calendar'),
-    path('create-wish/<int:employee_id>/', views.create_birthday_wish, name='create_wish'),
-    path('view-wish/<int:wish_id>/', views.view_birthday_wish, name='view_wish'),
-    path('api/upcoming/', views.upcoming_birthdays_api, name='upcoming_api'),
+    path('', views.calendar_view, name='calendar'),
+    path('create/', views.create_wish, name='create_wish'),
+    path('create/<int:user_id>/', views.create_wish, name='create_wish_for_user'),
+    path('view/<int:wish_id>/', views.view_wish, name='view_wish'),
+    path('edit/<int:wish_id>/', views.edit_wish, name='edit_wish'),
+    path('delete/<int:wish_id>/', views.delete_wish, name='delete_wish'),
+    path('todays-birthdays/', views.todays_birthdays, name='todays_birthdays'),
 ]
