@@ -16,5 +16,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('performance/', include('performance_reviews.urls')),
     path('announcements/', include('announcements.urls')),
-    path('birthdays/', include('birthday_calendar.urls', namespace='birthday_calendar')),
+    path('birthdays/', include('birthday_calendar.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
