@@ -8,6 +8,8 @@ from performance_reviews.models import ReviewSchedule
 from django.utils import timezone
 from django.db.models import Q
 from announcements.models import Announcement
+# Import the widget function
+from .widgets import get_upcoming_birthdays_widget
 
 @login_required
 def dashboard(request):
@@ -56,6 +58,12 @@ def dashboard(request):
             'rejected': rejected,
             'my_upcoming_reviews': my_upcoming_reviews,
         })
+    
+    # Get the upcoming birthdays widget data
+    birthdays_widget = get_upcoming_birthdays_widget(request)
+    
+    # Add birthdays widget data to context
+    context['birthdays_widget'] = birthdays_widget
     
     return render(request, 'dashboard/dashboard.html', context)
 
