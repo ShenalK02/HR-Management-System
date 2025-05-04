@@ -1,116 +1,215 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 from datetime import datetime, timedelta
-from django.db.models.functions import Extract
-from django.db.models import F, ExpressionWrapper, DateField, Case, When, Value
-
-from employees.models import Employee
 from .models import BirthdayWish
+from .forms import BirthdayWishForm
+
+User = get_user_model()
+
+def is_hr(user):
+    return user.groups.filter(name='HR').exists() or user.is_hr
 
 @login_required
-def birthday_calendar(request):
-    """Main calendar view showing all employee birthdays"""
-    employees = Employee.objects.all().order_by(
-        Extract('date_of_birth', 'month'),
-        Extract('date_of_birth', 'day')
-    )
+@user_passes_test(is_hr)
+def calendar_view(request):
+    # Get all birthday wishes
+    all_wishes = BirthdayWish.objects.all()
     
-    # Check if user is HR to enable special features
-    is_hr = request.user.is_hr
+    # Get all employees with a date of birth
+    employees_with_dob = User.objects.exclude(date_of_birth__isnull=True)
     
-    context = {
-        'employees': employees,
-        'is_hr': is_hr,
-    }
-    return render(request, 'birthday_calendar/calendar.html', context)
-
-@login_required
-def create_birthday_wish(request, employee_id):
-    """Create a birthday wish for an employee (HR only)"""
-    # Check if user is HR
-    if not request.user.is_hr:
-        return redirect('birthday_calendar:calendar')
-    
-    employee = get_object_or_404(Employee, id=employee_id)
-    
-    if request.method == 'POST':
-        wish_text = request.POST.get('wish_text')
-        description = request.POST.get('description')
-        animation_type = request.POST.get('animation_type')
-        
-        # Deactivate any existing active wishes for this employee
-        BirthdayWish.objects.filter(employee=employee, is_active=True).update(is_active=False)
-        
-        # Create new wish
-        BirthdayWish.objects.create(
-            employee=employee,
-            wish_text=wish_text,
-            description=description,
-            created_by=request.user,
-            animation_type=animation_type
-        )
-        return redirect('birthday_calendar:calendar')
-    
-    context = {
-        'employee': employee,
-    }
-    return render(request, 'birthday_calendar/create_wish.html', context)
-
-@login_required
-def view_birthday_wish(request, wish_id):
-    """View a specific birthday wish"""
-    wish = get_object_or_404(BirthdayWish, id=wish_id, is_active=True)
-    
-    context = {
-        'wish': wish,
-    }
-    return render(request, 'birthday_calendar/view_wish.html', context)
-
-@login_required
-def upcoming_birthdays_api(request):
-    """API endpoint to get upcoming birthdays in the next 30 days"""
+    # Get today's date
     today = timezone.now().date()
     thirty_days_later = today + timedelta(days=30)
     
-    # Create a calculated field for this year's birthday
-    employees = Employee.objects.annotate(
-        birthday_month=Extract('date_of_birth', 'month'),
-        birthday_day=Extract('date_of_birth', 'day'),
-        next_birthday=ExpressionWrapper(
-            Case(
-                # If birthday already passed this year, use next year's date
-                When(
-                    birthday_month__lt=today.month,
-                    then=Value(f"{today.year + 1}-") + F('birthday_month') + Value(f"-{F('birthday_day')}")
-                ),
-                When(
-                    birthday_month=today.month,
-                    birthday_day__lt=today.day,
-                    then=Value(f"{today.year + 1}-") + F('birthday_month') + Value(f"-{F('birthday_day')}")
-                ),
-                # Otherwise use this year's date
-                default=Value(f"{today.year}-") + F('birthday_month') + Value(f"-{F('birthday_day')}")
-            ),
-            output_field=DateField()
-        )
-    ).filter(
-        next_birthday__lte=thirty_days_later,
-        next_birthday__gte=today
-    ).order_by('next_birthday')
+    # Process upcoming birthdays (next 30 days)
+    upcoming_birthdays = []
     
-    birthdays = []
-    for employee in employees:
-        # Check if employee has an active birthday wish
-        wish = BirthdayWish.objects.filter(employee=employee, is_active=True).first()
-        
-        birthdays.append({
-            'id': employee.id,
-            'name': employee.get_full_name(),
-            'next_birthday': employee.next_birthday.strftime('%Y-%m-%d'),
-            'has_wish': wish is not None,
-            'wish_id': wish.id if wish else None
-        })
+    for employee in employees_with_dob:
+        if employee.date_of_birth:
+            # Get this year's birthday
+            this_year = today.year
+            birth_month = employee.date_of_birth.month
+            birth_day = employee.date_of_birth.day
+            
+            # Create a date for this year's birthday
+            this_year_bday = datetime(this_year, birth_month, birth_day).date()
+            
+            # If birthday has passed this year, use next year's date
+            if this_year_bday < today:
+                this_year_bday = datetime(this_year + 1, birth_month, birth_day).date()
+            
+            # Check if within 30 days window
+            if today <= this_year_bday <= thirty_days_later:
+                # Get wishes for this employee
+                wishes = BirthdayWish.objects.filter(employee=employee)
+                wish = wishes.first() if wishes.exists() else None
+                
+                upcoming_birthdays.append({
+                    'employee': employee,
+                    'birth_date': employee.date_of_birth,
+                    'celebration_date': this_year_bday,
+                    'days_until': (this_year_bday - today).days,
+                    'wish': wish
+                })
     
-    return JsonResponse({'birthdays': birthdays})
+    # Sort by days until birthday
+    upcoming_birthdays.sort(key=lambda x: x['days_until'])
+    
+    # Get today's birthdays
+    todays_birthdays = []
+    for employee in employees_with_dob:
+        if employee.date_of_birth:
+            # Check if today is their birthday (ignore year)
+            if employee.date_of_birth.month == today.month and employee.date_of_birth.day == today.day:
+                # Get wishes for this employee
+                wishes = BirthdayWish.objects.filter(employee=employee)
+                wish = wishes.first() if wishes.exists() else None
+                
+                todays_birthdays.append({
+                    'employee': employee,
+                    'birth_date': employee.date_of_birth,
+                    'wish': wish
+                })
+    
+    return render(request, 'birthday_calendar/calendar.html', {
+        'all_wishes': all_wishes,
+        'upcoming_birthdays': upcoming_birthdays,
+        'todays_birthdays': todays_birthdays,
+    })
+
+@login_required
+@user_passes_test(is_hr)
+def create_wish(request, user_id=None):
+    employee = None
+    if user_id:
+        employee = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        form = BirthdayWishForm(request.POST)
+        if form.is_valid():
+            wish = form.save(commit=False)
+            wish.created_by = request.user
+            
+            # Set the celebration_date based on the employee's birth date
+            if wish.employee and wish.employee.date_of_birth:
+                # Get current year
+                current_year = timezone.now().year
+                month = wish.employee.date_of_birth.month
+                day = wish.employee.date_of_birth.day
+                
+                # Set the celebration date to this year's birthday
+                wish.celebration_date = datetime(current_year, month, day).date()
+                
+                # If birthday has already passed this year, set for next year
+                if wish.celebration_date < timezone.now().date():
+                    wish.celebration_date = datetime(current_year + 1, month, day).date()
+            
+            wish.save()
+            messages.success(request, 'Birthday wish created successfully!')
+            return redirect('birthday_calendar:calendar')
+    else:
+        initial_data = {}
+        if employee:
+            initial_data['employee'] = employee
+        form = BirthdayWishForm(initial=initial_data)
+    
+    return render(request, 'birthday_calendar/create_wish.html', {
+        'form': form,
+        'employee': employee
+    })
+
+@login_required
+def view_wish(request, wish_id):
+    wish = get_object_or_404(BirthdayWish, id=wish_id)
+    today = timezone.now().date()
+    
+    # Check if it's the person's birthday today
+    is_birthday_today = False
+    if wish.employee.date_of_birth:
+        is_birthday_today = (wish.employee.date_of_birth.month == today.month and 
+                            wish.employee.date_of_birth.day == today.day)
+    
+    # Get all wishes for this user to show multiple messages
+    all_user_wishes = BirthdayWish.objects.filter(employee=wish.employee)
+    
+    return render(request, 'birthday_calendar/view_wish.html', {
+        'wish': wish,
+        'is_birthday_today': is_birthday_today,
+        'all_user_wishes': all_user_wishes,
+    })
+
+@login_required
+@user_passes_test(is_hr)
+def edit_wish(request, wish_id):
+    wish = get_object_or_404(BirthdayWish, id=wish_id)
+    
+    if request.method == 'POST':
+        form = BirthdayWishForm(request.POST, instance=wish)
+        if form.is_valid():
+            updated_wish = form.save(commit=False)
+            
+            # Update the celebration_date based on the employee's birth date if employee changed
+            if updated_wish.employee and updated_wish.employee.date_of_birth:
+                current_year = timezone.now().year
+                month = updated_wish.employee.date_of_birth.month
+                day = updated_wish.employee.date_of_birth.day
+                
+                # Set the celebration date to this year's birthday
+                updated_wish.celebration_date = datetime(current_year, month, day).date()
+                
+                # If birthday has already passed this year, set for next year
+                if updated_wish.celebration_date < timezone.now().date():
+                    updated_wish.celebration_date = datetime(current_year + 1, month, day).date()
+            
+            updated_wish.save()
+            messages.success(request, 'Birthday wish updated successfully!')
+            return redirect('birthday_calendar:view_wish', wish_id=wish.id)
+    else:
+        form = BirthdayWishForm(instance=wish)
+    
+    return render(request, 'birthday_calendar/create_wish.html', {
+        'form': form,
+        'editing': True,
+        'wish': wish
+    })
+
+@login_required
+@user_passes_test(is_hr)
+def delete_wish(request, wish_id):
+    wish = get_object_or_404(BirthdayWish, id=wish_id)
+    
+    if request.method == 'POST':
+        wish.delete()
+        messages.success(request, 'Birthday wish deleted successfully!')
+        return redirect('birthday_calendar:calendar')
+    
+    return render(request, 'birthday_calendar/delete_confirmation.html', {
+        'wish': wish
+    })
+
+@login_required
+def todays_birthdays(request):
+    """Function to get today's birthdays for the dashboard"""
+    today = timezone.now().date()
+    
+    # Find employees whose birthdays are today
+    birthday_employees = User.objects.exclude(date_of_birth__isnull=True).filter(
+        date_of_birth__month=today.month,
+        date_of_birth__day=today.day
+    )
+    
+    # Get wishes for those employees that should be displayed on dashboard
+    birthday_wishes = BirthdayWish.objects.filter(
+        employee__in=birthday_employees,
+        display_on_dashboard=True
+    )
+    
+    return render(request, 'birthday_calendar/dashboard_birthdays.html', {
+        'birthday_wishes': birthday_wishes,
+        'birthday_employees': birthday_employees,
+    })
