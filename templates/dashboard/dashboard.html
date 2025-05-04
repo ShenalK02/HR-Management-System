@@ -128,6 +128,7 @@
         </div>
     </div>
 
+
     <div class="col-lg-3 col-6">
         <div class="small-box bg-danger">
             <div class="inner">
@@ -180,6 +181,9 @@
                 </table>
             </div>
         </div>
+        
+        <!-- Today's Celebrations moved here -->
+        {% include 'dashboard/birthday_widget.html' %}
     </div>
 
     <div class="col-md-6">
@@ -210,6 +214,7 @@
         </div>
     </div>
 </div>
+
 {% if my_upcoming_reviews %}
 <div class="card mt-4">
     <div class="card-header bg-info text-white">
@@ -240,6 +245,7 @@
     </div>
 </div>
 {% endif %}
+
 {% if recent_announcements %}
 <div class="card mt-4">
     <div class="card-header bg-info text-white">
