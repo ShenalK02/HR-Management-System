@@ -1,33 +1,33 @@
 from django.db import models
-from employees.models import Employee
+from django.conf import settings
+from django.utils import timezone
 
 class BirthdayWish(models.Model):
-    ANIMATION_CHOICES = [
+    # Update User references to use settings.AUTH_USER_MODEL
+    employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='birthday_wishes')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_wishes')
+    message = models.TextField()
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # This will be populated from the employee's date_of_birth
+    celebration_date = models.DateField(default=timezone.now)
+    
+    # Choose from a set of celebration styles
+    CELEBRATION_STYLES = [
         ('confetti', 'Confetti'),
         ('balloons', 'Balloons'),
         ('fireworks', 'Fireworks'),
         ('cake', 'Cake Animation'),
+        ('stars', 'Stars'),
     ]
+    celebration_style = models.CharField(max_length=20, choices=CELEBRATION_STYLES, default='confetti')
     
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='birthday_wishes')
-    wish_text = models.TextField(help_text="Enter your birthday wish message")
-    description = models.TextField(blank=True, null=True)
-    created_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, 
-                                  null=True, related_name='created_wishes')
-    created_date = models.DateTimeField(auto_now_add=True)
-    animation_type = models.CharField(max_length=50, choices=ANIMATION_CHOICES, default='confetti')
-    is_active = models.BooleanField(default=True)
+    # Flag to indicate if this wish should be displayed on the main dashboard
+    display_on_dashboard = models.BooleanField(default=True)
     
     def __str__(self):
-        return f"Birthday wish for {self.employee.get_full_name()}"
+        return f"Birthday wish for {self.employee.username} on {self.celebration_date}"
     
     class Meta:
-        verbose_name = "Birthday Wish"
-        verbose_name_plural = "Birthday Wishes"
-        constraints = [
-            models.UniqueConstraint(
-                fields=['employee'],
-                condition=models.Q(is_active=True),
-                name='unique_active_wish_per_employee'
-            )
-        ]
+        ordering = ['celebration_date']
