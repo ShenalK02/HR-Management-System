@@ -142,6 +142,13 @@
                             </a>
                         </li>
                         {% endif %}
+                        
+                        <li class="nav-item">
+                            <a href="{% url 'payroll_dashboard' %}" class="nav-link {% if 'payroll_dashboard' in request.path %}active{% endif %}">
+                                <i class="bi bi-currency-dollar"></i>
+                                <p>Payroll</p>
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a href="{% url 'leave_list' %}" class="nav-link {% if 'leave' in request.path %}active{% endif %}">
