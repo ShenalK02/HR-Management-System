@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Team{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Meet Our Team</h2>
+    <div class="row">
+        {% for employee in employees %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                {% if employee.profile_picture %}
+                <img src="{{ employee.profile_picture.url }}" class="card-img-top img-fluid" alt="{{ employee.get_full_name }}">
+                {% else %}
+                <div class="text-center bg-light py-5">
+                    <i class="fas fa-user fa-5x text-secondary"></i>
+                </div>
+                {% endif %}
+                <div class="card-body text-center">
+                    <h4 class="card-text mb-1">{{ employee.first_name }} {{ employee.last_name }}</strong></h4>
+                    <p class="card-text mb-1"><strong>Position:</strong> {{ employee.position }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No team members found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
