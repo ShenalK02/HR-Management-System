@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Review Feedback{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Review Feedback</h1>
+    <h4>{{ review.employee }} - {{ review.title }}</h4>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    {{ form.employee_feedback.label_tag }}
+                    {{ form.employee_feedback }}
+                    <small class="form-text text-muted">Feedback provided by the employee</small>
+                    {% if form.employee_feedback.errors %}
+                        <div class="text-danger">{{ form.employee_feedback.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.department_head_feedback.label_tag }}
+                    {{ form.department_head_feedback }}
+                    {% if form.department_head_feedback.errors %}
+                        <div class="text-danger">{{ form.department_head_feedback.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.strengths.label_tag }}
+                    {{ form.strengths }}
+                    {% if form.strengths.errors %}
+                        <div class="text-danger">{{ form.strengths.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.areas_for_improvement.label_tag }}
+                    {{ form.areas_for_improvement }}
+                    {% if form.areas_for_improvement.errors %}
+                        <div class="text-danger">{{ form.areas_for_improvement.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.goals.label_tag }}
+                    {{ form.goals }}
+                    {% if form.goals.errors %}
+                        <div class="text-danger">{{ form.goals.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group mt-3">
+                    {{ form.final_rating.label_tag }}
+                    {{ form.final_rating }}
+                    <small class="form-text text-muted">Rating from 1-5</small>
+                    {% if form.final_rating.errors %}
+                        <div class="text-danger">{{ form.final_rating.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-check mt-3">
+                    {{ form.is_published }}
+                    {{ form.is_published.label_tag }}
+                    <small class="form-text text-muted">Check to publish this feedback to the employee</small>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Save Feedback</button>
+                    <a href="{% url 'review_detail' review.id %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

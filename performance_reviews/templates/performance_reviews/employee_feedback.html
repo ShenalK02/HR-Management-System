@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Provide Self-Assessment{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Self-Assessment for Review</h1>
+    <h4>{{ review.title }}</h4>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="employee_feedback">Your Self-Assessment:</label>
+                    <textarea name="employee_feedback" id="employee_feedback" rows="6" class="form-control">{{ feedback.employee_feedback }}</textarea>
+                    <small class="form-text text-muted">
+                        Please provide your thoughts on your performance since your last review.
+                        Include accomplishments, challenges faced, and areas you'd like to improve.
+                    </small>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                    <a href="{% url 'review_detail' review.id %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

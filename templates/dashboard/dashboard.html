@@ -60,6 +60,41 @@
             </a>
         </div>
     </div>
+    <!-- Add Upcoming Performance Reviews Section -->
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Upcoming Performance Reviews</h5>
+        </div>
+        <div class="card-body">
+            {% if upcoming_reviews %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Date & Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in upcoming_reviews %}
+                            <tr>
+                                <td>{{ review.employee }}</td>
+                                <td>{{ review.scheduled_date|date:"M d, Y h:i A" }}</td>
+                                <td>
+                                    <a href="{% url 'review_detail' review.id %}" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'review_calendar' %}" class="btn btn-sm btn-outline-primary mt-2">View All</a>
+            {% else %}
+                <p>No upcoming reviews scheduled.</p>
+            {% endif %}
+        </div>
+    </div>
 
     {% else %}
     <!-- Employee Dashboard -->
@@ -93,6 +128,7 @@
         </div>
     </div>
 
+
     <div class="col-lg-3 col-6">
         <div class="small-box bg-danger">
             <div class="inner">
@@ -111,40 +147,9 @@
 </div>
 
 <div class="row">
+    <!-- Today's Celebrations moved here -->
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Recent Leave Requests</h3>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Dates</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for leave in recent_leaves %}
-                        <tr>
-                            <td>{{ leave.leave_type.name }}</td>
-                            <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
-                            <td>
-                                <span class="badge bg-{% if leave.status == 'A' %}success{% elif leave.status == 'R' %}danger{% else %}warning{% endif %}">
-                                    {{ leave.get_status_display }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="3">No recent leave requests</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        {% include 'dashboard/birthday_widget.html' %}
     </div>
 
     <div class="col-md-6">
@@ -175,4 +180,68 @@
         </div>
     </div>
 </div>
+
+{% if recent_announcements %}
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Recent Announcements</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            {% for announcement in recent_announcements %}
+            <a href="{% url 'announcement_detail' announcement.pk %}" class="list-group-item list-group-item-action {% if announcement.is_important %}list-group-item-danger{% endif %}">
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">
+                        {% if announcement.is_important %}
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        {% endif %}
+                        {{ announcement.title }}
+                    </h6>
+                    <small>{{ announcement.created_at|date:"M d" }}</small>
+                </div>
+                <p class="mb-1 text-muted">{{ announcement.content|truncatechars:100 }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <a href="{% url 'announcement_list' %}" class="btn btn-sm btn-outline-info">View All Announcements</a>
+        {% if user.is_hr %}
+        <a href="{% url 'announcement_create' %}" class="btn btn-sm btn-outline-primary">Create New</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if my_upcoming_reviews %}
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Your Upcoming Performance Reviews</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in my_upcoming_reviews %}
+                    <tr>
+                        <td>{{ review.scheduled_date|date:"M d, Y h:i A" }}</td>
+                        <td>
+                            <a href="{% url 'review_detail' review.id %}" class="btn btn-sm btn-info">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'review_calendar' %}" class="btn btn-sm btn-outline-info mt-2">View All</a>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

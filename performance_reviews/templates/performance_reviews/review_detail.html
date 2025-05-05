@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Performance Review Details</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>{{ review.title }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Employee:</div>
+                <div class="col-md-9">{{ review.employee }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Department Head:</div>
+                <div class="col-md-9">{{ review.department_head }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Scheduled Date:</div>
+                <div class="col-md-9">{{ review.scheduled_date|date:"F d, Y h:i A" }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Status:</div>
+                <div class="col-md-9">{{ review.get_status_display }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Description:</div>
+                <div class="col-md-9">{{ review.description }}</div>
+            </div>
+        </div>
+    </div>
+    
+    {% if feedback %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Review Feedback</h5>
+        </div>
+        <div class="card-body">
+            {% if feedback.is_published or user.is_hr or user == review.department_head %}
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Employee Feedback:</div>
+                    <div class="col-md-9">{{ feedback.employee_feedback|linebreaks }}</div>
+                </div>
+                
+                {% if feedback.is_published or user.is_hr or user == review.department_head %}
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Department Head Feedback:</div>
+                    <div class="col-md-9">{{ feedback.department_head_feedback|linebreaks }}</div>
+                </div>
+                {% endif %}
+                
+                {% if feedback.is_published or user.is_hr or user == review.department_head %}
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Strengths:</div>
+                    <div class="col-md-9">{{ feedback.strengths|linebreaks }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Areas for Improvement:</div>
+                    <div class="col-md-9">{{ feedback.areas_for_improvement|linebreaks }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Goals:</div>
+                    <div class="col-md-9">{{ feedback.goals|linebreaks }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Rating:</div>
+                    <div class="col-md-9">{{ feedback.final_rating }}/5</div>
+                </div>
+                {% endif %}
+                
+                {% if feedback.is_published %}
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Published:</div>
+                    <div class="col-md-9">{{ feedback.published_date|date:"F d, Y" }}</div>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    Feedback will be available once the review is completed and published.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="mb-4">
+        {% if user.is_hr or user == review.department_head %}
+            <a href="{% url 'edit_feedback' review.id %}" class="btn btn-primary">
+                {% if feedback.id %}Edit Feedback{% else %}Add Feedback{% endif %}
+            </a>
+        {% endif %}
+        
+        {% if user == review.employee.user and review.status == 'scheduled' %}
+            <a href="{% url 'employee_feedback' review.id %}" class="btn btn-primary">Provide Self-Assessment</a>
+        {% endif %}
+        
+        <a href="{% url 'review_calendar' %}" class="btn btn-secondary">Back to Calendar</a>
+    </div>
+</div>
+{% endblock %}
