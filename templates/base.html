@@ -114,9 +114,15 @@
 
         <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
             <a href="{% url 'dashboard' %}" class="brand-link text-white text-decoration-none d-flex align-items-center">
-                <img src="{% static 'images/logo.png' %}" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8; height: 30px;">
-                <span class="brand-text font-weight-light ms-2">HRMS</span>
+                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <img src="{% static 'images/logo.png' %}" 
+                         alt="Logo" 
+                         class="img-fluid" 
+                         style="height: 35px;">
+                </div>
+                <span class="brand-text font-weight-light ms-2">HRM System</span>
             </a>
 
             <div class="sidebar">
