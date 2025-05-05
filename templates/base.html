@@ -14,11 +14,11 @@
     <style>
         .content-wrapper h1,
         .content-wrapper h2,
-        .content-wrapper h3
+        .content-wrapper h3,
         .content-wrapper h5 {
             color: white !important;
         }
-        
+
         body {
             background: url("{% static 'images/bg3.png' %}") no-repeat center center fixed;
             background-size: cover;
@@ -200,6 +200,14 @@
                                 <p>Birthday Calendar</p>
                             </a>
                         </li>
+
+                        <!-- Our Team link added here -->
+                        <li class="nav-item">
+                            <a href="{% url 'our_team' %}" class="nav-link {% if 'our_team' in request.path %}active{% endif %}">
+                                <i class="bi bi-person-lines-fill"></i>
+                                <p>Our Team</p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -207,7 +215,6 @@
 
         <!-- Content Wrapper -->
         <div class="content-wrapper bg-transparent">
-            <!-- Header -->
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
@@ -223,7 +230,6 @@
                 </div>
             </div>
 
-            <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
                     {% block content %}{% endblock %}
