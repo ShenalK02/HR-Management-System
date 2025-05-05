@@ -2,35 +2,52 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<style>
+  .login-card {
+    background-color: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+  }
 
-<div class="container mt-5">
+  body.sidebar-mini .main-sidebar {
+    display: none !important; /* Hide sidebar */
+  }
 
-  <!-- New button to go to official website -->
-  <div class="mb-4 text-center">
-    <a href="https://aivaadvertising.com/" target="_blank" class="btn btn-outline-info">
-      Visit Our Official Website
-    </a>
-  </div>
+  .content-wrapper {
+    margin-left: 0 !important; /* Remove left offset from sidebar */
+    background-color: transparent !important;
+  }
 
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="text-center">Login</h3>
-        </div>
-        <div class="card-body">
-          <form method="post">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary">Login</button>
-            </div>
-          </form>
-        </div>
+  .main-header {
+    display: none; /* Optionally hide header if needed */
+  }
+
+  footer.main-footer {
+    display: none; /* Optionally hide footer */
+  }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="col-md-6">
+    <div class="text-center mb-4">
+      <a href="https://aivaadvertising.com/" target="_blank" class="btn btn-outline-info">
+        Visit Our Official Website
+      </a>
+    </div>
+    <div class="card login-card">
+      <div class="card-header text-center">
+        <h3>Login</h3>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-
 </div>
-
 {% endblock %}
