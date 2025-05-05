@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,11 @@
     <link href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css" rel="stylesheet" />
 
     <style>
-        /* Sidebar Customization */
+        body {
+            background: url("{% static 'images/bg3.png' %}") no-repeat center center fixed;
+            background-size: cover;
+        }
+
         .main-sidebar {
             background-color: #0d6efd !important;
         }
@@ -51,13 +56,13 @@
 
         .main-header .nav-link,
         .main-header .dropdown-menu a {
-            color:rgb(7, 7, 7) !important;
+            color: rgb(7, 7, 7) !important;
         }
+
         .main-header .nav-link:hover {
             background-color: #0b5ed7 !important;
             color: #ffffff !important;
         }
-        
 
         .dropdown-menu {
             background-color: #f8f9fa;
@@ -103,8 +108,8 @@
 
         <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <a href="{% url 'dashboard' %}" class="brand-link text-white text-decoration-none">
-                <i class="bi bi-people-fill brand-image img-circle elevation-3" style="opacity: .8"></i>
+            <a href="{% url 'dashboard' %}" class="brand-link text-white text-decoration-none d-flex align-items-center">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8; height: 30px;">
                 <span class="brand-text font-weight-light ms-2">HRMS</span>
             </a>
 
@@ -147,7 +152,7 @@
                             </a>
                         </li>
                         {% endif %}
-                        
+
                         <li class="nav-item">
                             <a href="{% url 'payroll_dashboard' %}" class="nav-link {% if 'payroll_dashboard' in request.path %}active{% endif %}">
                                 <i class="bi bi-currency-dollar"></i>
@@ -188,7 +193,7 @@
         </aside>
 
         <!-- Content Wrapper -->
-        <div class="content-wrapper">
+        <div class="content-wrapper bg-transparent">
             <!-- Header -->
             <div class="content-header">
                 <div class="container-fluid">
