@@ -11,6 +11,11 @@ def is_hr(user):
     return user.is_hr
 
 @login_required
+def our_team(request):
+    employees = Employee.objects.all()
+    return render(request, 'employees/our_team.html', {'employees': employees})
+
+@login_required
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     return render(request, 'employees/employee_detail.html', {'employee': employee})
